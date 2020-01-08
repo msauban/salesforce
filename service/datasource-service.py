@@ -1,11 +1,11 @@
 from functools import wraps
 from flask import Flask, request, Response, abort
 from datetime import datetime, timedelta
-from dateutil.parser import parse
+#Maxfrom dateutil.parser import parse
 import os
 
 import json
-import pytz
+#Maximport pytz
 from simple_salesforce import Salesforce
 import iso8601
 import logging
@@ -41,9 +41,9 @@ class DataAccess:
         # if datatype in self._entities:
         #     if len(self._entities[datatype]) > 0 and self._entities[datatype][0]["_updated"] > "%sZ" % (datetime.now() - timedelta(hours=12)).isoformat():
         #        return self._entities[datatype]
-        now = datetime.now(pytz.UTC)
+#Max        now = datetime.now(pytz.UTC)
         entities = []
-        end = datetime.now(pytz.UTC)  # we need to use UTC as salesforce API requires this
+#Max        end = datetime.now(pytz.UTC)  # we need to use UTC as salesforce API requires this
 
         if since is None:
             #fields = getattr(sf, datatype).describe()["fields"]
@@ -70,8 +70,8 @@ class DataAccess:
 
                 for property, value in c.items():
                     schema = [item for item in self._entities[datatype] if item["name"] == property]
-                    if value and len(schema) > 0 and "type" in schema[0] and schema[0]["type"] == "datetime":
-                        c[property] = to_transit_datetime(parse(value))
+#Max                    if value and len(schema) > 0 and "type" in schema[0] and schema[0]["type"] == "datetime":
+#Max                        c[property] = to_transit_datetime(parse(value))
 
 
                 entities.append(c)
@@ -94,7 +94,7 @@ def authenticate():
     """Sends a 401 response that enables basic auth"""
     return Response(
         'Could not verify your access level for that URL.\n'
-        'You have to login with proper credentials', 401,
+        'You have to login with proper credentials \n', 401,
         {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 def requires_auth(f):
@@ -119,9 +119,10 @@ def get_entities(datatype):
     auth = request.authorization
     token, username = auth.username.split('\\', 1)
     password = auth.password
+    print("username: ", username, " password: ", password, " sandbox: ", use_sandbox)
     logger.info("User = %s" % (auth.username))
     sf = Salesforce(username, password, token, sandbox=use_sandbox)
-    entities = sorted(data_access_layer.get_entities(since, datatype, sf), key=lambda k: k["_updated"])
+#Max    entities = sorted(data_access_layer.get_entities(since, datatype, sf), key=lambda k: k["_updated"])
 
     return Response(json.dumps(entities), mimetype='application/json')
 
@@ -143,10 +144,11 @@ def receiver(datatype):
     logger.info("User = %s" % (auth.username))
     token, username = auth.username.split('\\', 1)
     sf = Salesforce(username, auth.password, token, sandbox=use_sandbox)
+    print("use_sandbox", use_sandbox)
 
 
-    if getattr(sf, datatype):
-        transform(datatype, entities, sf)# create the response
+ #Max   if getattr(sf, datatype):
+#Max        transform(datatype, entities, sf)# create the response
     return Response("Thanks!", mimetype='text/plain')
 
 def transform(datatype, entities, sf):
