@@ -47,7 +47,8 @@ class DataAccess:
 
         if since is None:
             #fields = getattr(sf, datatype).describe()["fields"]
-            result = [x['Id'] for x in sf.query("SELECT Id FROM %s" % (datatype))["records"]]
+            #result = [x['Id'] for x in sf.query("SELECT Id FROM %s" % (datatype))["records"]]
+            result = [x['Id'] for x in sf.bulk.Account.query("SELECT Id FROM %s" % (datatype))["records"]]
         else:
             start = iso8601.parse_date(since)
             if getattr(sf, datatype):
