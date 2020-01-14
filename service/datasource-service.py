@@ -112,7 +112,8 @@ def requires_auth(f):
 @requires_auth
 def get_entities(datatype):
     since = request.args.get('since')
-    instance = get_var('instance') or "prod"
+    #instance = get_var('instance') or "prod"
+    instance = "sandbox"
     use_sandbox = False
     if instance == "sandbox":
         use_sandbox = True
@@ -121,7 +122,15 @@ def get_entities(datatype):
     token, username = auth.username.split('\\', 1)
     password = auth.password
     logger.info("User = %s" % (auth.username))
-    sf = Salesforce(username, password, token, sandbox=use_sandbox)
+    logger.info("User seul = %s" % (username))
+    logger.info("Token = %s" % (token))
+    logger.info("Password = %s" % (password))
+    logger.info("use_sandbox = %s" % (use_sandbox))
+    #sf = Salesforce(username, password, token, sandbox=use_sandbox)
+    try:
+        sf = Salesforce(username=username, password=password, security_token=token, sandbox=use_sandbox)
+    except Exception as err:
+        app.logger.info("Issue logging in. %s" % (str(err)))
     entities = sorted(data_access_layer.get_entities(since, datatype, sf), key=lambda k: k["_updated"])
 
     return Response(json.dumps(entities), mimetype='application/json')
